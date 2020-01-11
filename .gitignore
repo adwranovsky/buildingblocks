@@ -1,0 +1,6 @@
+# Vim files
+*.Session
+*.sw*
+
+# Icarus Verilog output
+iverilog
