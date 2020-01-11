@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from myhdl import block, always_comb, always_seq, enum, Signal, modbv, intbv, ResetSignal
+from myhdl import *
 
 @block
 def timer(clk: Signal, reset: ResetSignal, start: Signal, done: Signal, STOP_COUNT=100):
@@ -32,14 +32,15 @@ def timer(clk: Signal, reset: ResetSignal, start: Signal, done: Signal, STOP_COU
                 state.next = t_state.RUNNING
         elif state == t_state.RUNNING:
             state.next = t_state.RUNNING
-            timer.next = timer - 1
             if timer == 0:
                 timer.next = STOP_COUNT - 1
                 if start == 0:
                     state.next = t_state.IDLE
                 else:
                     state.next = t_state.RUNNING
+            else:
+                timer.next = timer - 1
         else:
             raise ValueError("Undefined state")
 
-    return comb_logic, seq_logic
+    return instances()
