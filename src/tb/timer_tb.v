@@ -29,7 +29,7 @@ initial begin
     error_count = 0;
 
     // Generate vcd file for waveform viewing in gtkwave
-    $dumpfile("timer.vcd");
+    $dumpfile("iverilog/timer.vcd");
     $dumpvars(2, timer_tb);
 
     // Start simulation and deassert reset
@@ -39,7 +39,7 @@ initial begin
     repeat(5) @(negedge clk);
 
     
-    // Test 2 
+    // Test 2 non-consecutive starts on both timers.
     repeat(2) begin
         start = 1;
         @(posedge clk) #1 start_cycle_count = cycle_count;
@@ -50,7 +50,7 @@ initial begin
         if (total_cycle_count != `TIM0_COUNT)
             error_count = error_count + 1;
         $display(
-            "%s -- Timer 0 length: %d",
+            "%s -- Timer 0 single pulse length: %0d",
             total_cycle_count == `TIM0_COUNT ? "PASSED" : "FAILED",
             total_cycle_count
         );
@@ -60,11 +60,30 @@ initial begin
         if (total_cycle_count != `TIM1_COUNT)
             error_count = error_count + 1;
         $display(
-            "%s -- Timer 1 length: %d",
+            "%s -- Timer 1 single pulse length: %0d",
             total_cycle_count == `TIM1_COUNT ? "PASSED" : "FAILED",
             total_cycle_count
         );
 
+        repeat(20) @(negedge clk);
+    end
+
+    // Test 2 consecutive starts on timer 0.
+    repeat(2) begin
+        start = 1;
+        @(posedge clk) #1 start_cycle_count = cycle_count;
+
+        repeat (2) @(posedge done[0])
+        total_cycle_count = cycle_count - start_cycle_count;
+        if (total_cycle_count != `TIM0_COUNT * 2)
+            error_count = error_count + 1;
+        $display(
+            "%s -- Timer 0 double pulse length: %0d",
+            total_cycle_count == `TIM0_COUNT * 2 ? "PASSED" : "FAILED",
+            total_cycle_count
+        );
+
+        @(negedge clk) start = 0;
         repeat(20) @(negedge clk);
     end
 
@@ -91,7 +110,7 @@ initial begin
     if (error_count == 0) begin
         $display("All tests passed.");
     end else begin
-        $display("Failed %d tests.", error_count);
+        $display("Failed %0d tests.", error_count);
     end
 
     #5 $finish;
