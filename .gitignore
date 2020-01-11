@@ -4,3 +4,6 @@
 
 # Icarus Verilog output
 iverilog
+
+# LibreOffice temporary files
+.~lock*
