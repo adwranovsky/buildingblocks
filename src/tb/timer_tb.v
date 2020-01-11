@@ -29,7 +29,7 @@ initial begin
     error_count = 0;
 
     // Generate vcd file for waveform viewing in gtkwave
-    $dumpfile("iverilog/timer.vcd");
+    $dumpfile("iverilog/timer_tb.vcd");
     $dumpvars(2, timer_tb);
 
     // Start simulation and deassert reset
