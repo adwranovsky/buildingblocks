@@ -30,6 +30,11 @@ always @(*) begin
     `RUNNING: begin
         if (timer == STOP_COUNT) begin
             done_reg = 1;
+            if (start == 1'b1) begin
+                next_state = `RUNNING;
+                // Start at 1 so that two back-to-back runs will take exactly 2 * STOP_COUNT.
+                next_timer = 1;
+            end
         end else begin
             next_state = `RUNNING;
             next_timer = timer + 1;
