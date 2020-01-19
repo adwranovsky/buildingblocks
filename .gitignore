@@ -1,6 +1,9 @@
 # Vim files
-*.Session
+*.vim
 *.sw*
+
+# Simulation files
+*.vcd
 
 # Icarus Verilog output
 iverilog
