@@ -6,13 +6,13 @@ from timer import timer
 from incrementer import incrementer
 
 class Baud():
-    def __init__(clk_freq, bitrate):
-        self._clk_freq = clk_freq
-        self._bitrate = bitrate
+    def __init__(self, clk_freq, bitrate):
+        self._clk_freq = int(clk_freq)
+        self._bitrate = int(bitrate)
 
     @property
     def bit_period(self):
-        return self._clk_freq / self._bitrate
+        return int(self._clk_freq // self._bitrate)
 
 @block
 def uart_rx(clk, reset, serial_in, byte_out, valid, baud):
@@ -36,23 +36,22 @@ def uart_rx(clk, reset, serial_in, byte_out, valid, baud):
     # in the middle.
     half_bit_tstart = Signal(intbv(0)[1:])
     half_bit_done = Signal(intbv(0)[1:])
-    half_bit_timer = timer(clk=clk, reset=reset, start=half_bit_tstart, done=half_bit_done, STOP_COUNT=baud.bit_period/2)
+    half_bit_timer = timer(clk=clk, reset=reset, start=half_bit_tstart, done=half_bit_done, STOP_COUNT=int(baud.bit_period/2))
 
     # The done signal of full_bit_timer indicates that the next bit should be sampled
     full_bit_tstart = Signal(intbv(0)[1:])
     full_bit_done = Signal(intbv(0)[1:])
-    full_bit_timer = timer(clk=clk, reset=reset, start=full_bit_tstart, done=full_bit_done, STOP_COUNT=baud.bit_period)
+    full_bit_timer = timer(clk=clk, reset=reset, start=full_bit_tstart, done=full_bit_done, STOP_COUNT=int(baud.bit_period))
 
     bit_count = Signal(intbv(0, min=0, max=9)) # 8 data bits + 1 stop bit = max count of 9
     bit_counter = incrementer(clk=clk, reset=reset, inc=full_bit_done, clear=valid, count=bit_count)
 
-    @always_comb()
+    @always_comb
     def fsm_comb_logic():
-        full_bit_tstart = half_bit_done == 1 or (state == t_state.RUNNING and full_bit_done)
-        valid = bit_count == bit_count.max
+        valid.next = bit_count == bit_count.max-1 and full_bit_done == 1
         byte_out.next = shift_reg[9:1]
-        half_bit_tstart = state == t_state.IDLE and serial_in == 0
-        full_bit_tstart = half_bit_done == 1 or (full_bit_done == 1 and not bit_count+1 == bit_count.max)
+        half_bit_tstart.next = state == t_state.IDLE and serial_in == 0
+        full_bit_tstart.next = half_bit_done == 1 or (full_bit_done == 1 and not bit_count == bit_count.max-1)
 
     @always_seq(clk.posedge, reset=reset)
     def fsm_seq_logic():
@@ -64,13 +63,13 @@ def uart_rx(clk, reset, serial_in, byte_out, valid, baud):
             if half_bit_done == 1:
                 state.next = t_state.RUNNING
         elif state == t_state.RUNNING:
-            if bit_count == bit_count.max:
+            if valid == 1:
                 state.next = t_state.IDLE
         else:
             raise ValueError("Undefined state")
 
     @always_seq(clk.posedge, reset=reset)
-    def shift_reg():
+    def shift_reg_logic():
         if full_bit_done == 1:
             shift_reg.next = concat(shift_reg[9:0], serial_in)
         else:
