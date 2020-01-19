@@ -18,7 +18,7 @@ def incrementer(clk, reset, inc, clear, count):
     def seq_logc():
         if clear == 1:
             count.next = count.min
-        elif count == count.max:
+        elif count == count.max - 1:
             count.next = count
         elif inc == 1:
             count.next = count + 1
