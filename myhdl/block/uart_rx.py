@@ -29,7 +29,6 @@ def uart_rx(clk, reset, serial_in, byte_out, valid, baud):
     state = Signal(t_state.IDLE)
 
     shift_reg = Signal(intbv(0)[9:])
-    valid = Signal(intbv(0)[1:])
 
     # half_bit_timer starts at the beginning of the start bit, and the end of
     # it signals the start of full_bit_timer. It ensures that bits are sampled
