@@ -70,7 +70,7 @@ def uart_rx(clk, reset, serial_in, byte_out, valid, baud):
     @always_seq(clk.posedge, reset=reset)
     def shift_reg_logic():
         if full_bit_done == 1:
-            shift_reg.next = concat(shift_reg[9:0], serial_in)
+            shift_reg.next = concat(shift_reg[8:], serial_in)
         else:
             shift_reg.next = shift_reg
 
