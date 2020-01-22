@@ -96,8 +96,8 @@ def uart_rx_tb():
     @always(clk.posedge)
     def cycle_counter():
         cycle_count.next += 1
-        if cycle_count > 20000:
-            print("Hit 20k cycles. Something's wrong.")
+        if cycle_count > 100_000:
+            print("Hit 100k cycles. Something's wrong.")
             raise StopSimulation
 
     @always(delay(10))
