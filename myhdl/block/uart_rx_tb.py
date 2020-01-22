@@ -39,8 +39,8 @@ def uart_rx_tb():
     clk = Signal(bool(0))
 
     tx = Signal(intbv(1)[1:0])
-    data_read = Signal(intbv(0)[8:0])
-    valid = Signal(0)
+    data_read = Signal(intbv(0)[8:])
+    valid = Signal(intbv(0)[1:])
 
     baud = Baud(100e6, 1_000_000)
     uart = uart_rx(clk=clk, reset=rst_n, serial_in=tx, byte_out=data_read, valid=valid, baud=baud)
@@ -75,12 +75,12 @@ def uart_rx_tb():
             if data_read == byte:
                 print(
                     Fore.GREEN + "PASSED" + Style.RESET_ALL + " -- "
-                    + "byte read matched 0x%x" % byte
+                    "byte read matched 0x%x" % byte
                 )
             else:
                 print(
                     Fore.RED + "FAILED" + Style.RESET_ALL + " -- "
-                    + "read 0x%x, expected 0x%x" % (data_read, byte)
+                    "read 0x%x, expected 0x%x" % (data_read, byte)
                 )
                 error_count.next += 1
 
