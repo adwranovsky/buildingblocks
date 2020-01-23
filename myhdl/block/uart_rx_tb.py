@@ -14,13 +14,16 @@ def uart_tx_model(tx, data, baud):
     baud -- a baud object that represents the baud rate
     """
     print("-- Transmitting 0x%x" % data)
+
     print("--- start bit")
     tx.next = 0
     yield delay(baud.bit_period)
+
     for bit in range(8):
         print("--- %d" % data[bit])
         tx.next = data[bit]
         yield delay(baud.bit_period)
+
     print("--- stop bit")
     tx.next = 1
     yield delay(baud.bit_period)
@@ -52,9 +55,8 @@ def uart_rx_tb():
     def tx_generator():
         while True:
             yield start_tx.posedge
-            yield delay(1)
-            start_tx.next = 0
             yield uart_tx_model(tx, tx_byte, baud)
+            start_tx.next = 0
 
     @instance
     def tests():
@@ -72,6 +74,7 @@ def uart_rx_tb():
             tx_byte.next = byte
             start_tx.next = 1
             yield valid.posedge
+            yield start_tx.negedge
             if data_read == byte:
                 print(
                     Fore.GREEN + "PASSED" + Style.RESET_ALL + " -- "
@@ -83,9 +86,9 @@ def uart_rx_tb():
                     "read 0x%x, expected 0x%x" % (data_read, byte)
                 )
                 error_count.next += 1
+            yield delay(1)
 
         # Check errors and end simulation
-        yield delay(1)
         if error_count == 0:
             print(Fore.GREEN + "All tests passed :)" + Style.RESET_ALL)
         else:
@@ -100,7 +103,7 @@ def uart_rx_tb():
             print("Hit 100k cycles. Something's wrong.")
             raise StopSimulation
 
-    @always(delay(10))
+    @always(delay(5))
     def clock_generator():
         clk.next = not clk
 
