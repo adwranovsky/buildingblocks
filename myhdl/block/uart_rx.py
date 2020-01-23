@@ -53,7 +53,7 @@ def uart_rx(clk, reset, serial_in, byte_out, valid, baud):
     @always_comb
     def fsm_comb_logic():
         valid.next = bit_count == bit_count.max-1 and full_bit_done == 1
-        byte_out.next = shift_reg[9:1]
+        byte_out.next = shift_reg[8:0]
         half_bit_tstart.next = state == t_state.IDLE and serial_in == 0
         full_bit_tstart.next = half_bit_done == 1 or (full_bit_done == 1 and not bit_count == bit_count.max-1)
 
@@ -75,7 +75,7 @@ def uart_rx(clk, reset, serial_in, byte_out, valid, baud):
     @always_seq(clk.posedge, reset=reset)
     def shift_reg_logic():
         if full_bit_done == 1:
-            shift_reg.next = concat(shift_reg[8:], serial_in)
+            shift_reg.next = concat(serial_in, shift_reg[9:1])
         else:
             shift_reg.next = shift_reg
 
