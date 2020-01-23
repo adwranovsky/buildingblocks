@@ -33,7 +33,7 @@ def uart_rx_tb():
     """A testbench for the uart rx block"""
     random.seed(0x0a310a31)
 
-    test_bytes = [random.randint(0, (1<<8)-1) for x in range(50)]
+    test_bytes = [random.randint(0, (1<<8)-1) for x in range(10)]
 
     cycle_count = Signal(intbv(0))
     error_count = Signal(intbv(0))
