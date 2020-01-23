@@ -6,13 +6,18 @@ from timer import timer
 from incrementer import incrementer
 
 class Baud():
-    def __init__(self, clk_freq, bitrate):
+    def __init__(self, clk_freq, bitrate, TIMESCALE=1e-9):
         self._clk_freq = int(clk_freq)
         self._bitrate = int(bitrate)
+        self._timescale = TIMESCALE
+
+    @property
+    def clocks_per_bit(self):
+        return int(self._clk_freq // self._bitrate)
 
     @property
     def bit_period(self):
-        return int(self._clk_freq // self._bitrate)
+        return int(self._bitrate**-1 // self._timescale)
 
 @block
 def uart_rx(clk, reset, serial_in, byte_out, valid, baud):
@@ -35,12 +40,12 @@ def uart_rx(clk, reset, serial_in, byte_out, valid, baud):
     # in the middle.
     half_bit_tstart = Signal(intbv(0)[1:])
     half_bit_done = Signal(intbv(0)[1:])
-    half_bit_timer = timer(clk=clk, reset=reset, start=half_bit_tstart, done=half_bit_done, STOP_COUNT=int(baud.bit_period/2))
+    half_bit_timer = timer(clk=clk, reset=reset, start=half_bit_tstart, done=half_bit_done, STOP_COUNT=int(baud.clocks_per_bit/2))
 
     # The done signal of full_bit_timer indicates that the next bit should be sampled
     full_bit_tstart = Signal(intbv(0)[1:])
     full_bit_done = Signal(intbv(0)[1:])
-    full_bit_timer = timer(clk=clk, reset=reset, start=full_bit_tstart, done=full_bit_done, STOP_COUNT=int(baud.bit_period))
+    full_bit_timer = timer(clk=clk, reset=reset, start=full_bit_tstart, done=full_bit_done, STOP_COUNT=baud.clocks_per_bit)
 
     bit_count = Signal(intbv(0, min=0, max=9)) # 8 data bits + 1 stop bit = max count of 9
     bit_counter = incrementer(clk=clk, reset=reset, inc=full_bit_done, clear=valid, count=bit_count)
