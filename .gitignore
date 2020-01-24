@@ -1,12 +1,9 @@
-# Vim files
-*.vim
+# Python stuff
+venv
+__pycache__
+.mypy_cache
+*.egg-info
+
+# Vim stuff
 *.sw*
-
-# Simulation files
-*.vcd
-
-# Icarus Verilog output
-iverilog
-
-# LibreOffice temporary files
-.~lock*
+*.vim
