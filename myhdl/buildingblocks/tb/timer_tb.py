@@ -5,7 +5,8 @@ import random
 
 from colorama import Fore, Back, Style
 from myhdl import *
-from timer import timer
+
+from ..rtl.timer import timer
 
 @block
 def timer_tb():

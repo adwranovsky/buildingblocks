@@ -5,7 +5,9 @@ import random
 
 from colorama import Fore, Back, Style
 from myhdl import *
-from uart_rx import *
+
+from ..model.uart.baud import Baud
+from ..rtl.uart.rx import rx
 
 def uart_tx_model(tx, data, baud):
     """Models a UART with 1 start bit, 8 data bits, and 1 stop bit.
@@ -46,7 +48,7 @@ def uart_rx_tb():
     valid = Signal(intbv(0)[1:])
 
     baud = Baud(100e6, 1_000_000)
-    uart = uart_rx(clk=clk, reset=rst_n, serial_in=tx, byte_out=data_read, valid=valid, baud=baud)
+    uart = rx(clk=clk, reset=rst_n, serial_in=tx, byte_out=data_read, valid=valid, baud=baud)
 
     start_tx = Signal(0)
     tx_byte = Signal(intbv(0)[8:0])

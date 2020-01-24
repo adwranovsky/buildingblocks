@@ -2,25 +2,11 @@
 
 from myhdl import *
 
-from timer import timer
-from incrementer import incrementer
-
-class Baud():
-    def __init__(self, clk_freq, bitrate, TIMESCALE=1e-9):
-        self._clk_freq = int(clk_freq)
-        self._bitrate = int(bitrate)
-        self._timescale = TIMESCALE
-
-    @property
-    def clocks_per_bit(self):
-        return int(self._clk_freq // self._bitrate)
-
-    @property
-    def bit_period(self):
-        return int(self._bitrate**-1 // self._timescale)
+from ..timer import timer
+from ..incrementer import incrementer
 
 @block
-def uart_rx(clk, reset, serial_in, byte_out, valid, baud):
+def rx(clk, reset, serial_in, byte_out, valid, baud):
     """A simple UART with a fixed baud rate, one start bit, one stop bit, and no parity bit.
     clk -- The input clock
     reset -- The reset signal
