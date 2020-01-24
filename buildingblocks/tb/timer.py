@@ -9,7 +9,7 @@ from myhdl import *
 from ..rtl.timer import timer
 
 @block
-def timer_tb():
+def testbench():
     """A testbench for the timer block"""
     random.seed(24160)
 
@@ -121,9 +121,9 @@ def timer_tb():
 
     return instances()
 
-def run(do_dump):
-    tb = timer_tb()
-    tb.config_sim(trace=do_dump)
+def run(trace=False):
+    tb = testbench()
+    tb.config_sim(trace=trace)
     tb.run_sim()
 
 if __name__ == "__main__":
@@ -132,4 +132,4 @@ if __name__ == "__main__":
             do_dump = True
     except IndexError:
         do_dump = False
-    run(do_dump)
+    run(trace=do_dump)

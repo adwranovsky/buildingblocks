@@ -1,3 +1,3 @@
-from . import incrementer
-from . import timer
+from .incrementer import incrementer
+from .timer import timer
 from . import uart

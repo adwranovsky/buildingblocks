@@ -1,2 +1,2 @@
-from . import timer_tb
-from . import uart_rx_tb
+from . import timer
+from . import uart

@@ -6,8 +6,8 @@ import random
 from colorama import Fore, Back, Style
 from myhdl import *
 
-from ..model.uart.baud import Baud
-from ..rtl.uart.rx import rx
+from buildingblocks.model.uart.baud import Baud
+from buildingblocks.rtl import uart
 
 def uart_tx_model(tx, data, baud):
     """Models a UART with 1 start bit, 8 data bits, and 1 stop bit.
@@ -31,7 +31,7 @@ def uart_tx_model(tx, data, baud):
     yield delay(baud.bit_period)
 
 @block
-def uart_rx_tb():
+def testbench():
     """A testbench for the uart rx block"""
     random.seed(0x0a310a31)
 
@@ -48,7 +48,7 @@ def uart_rx_tb():
     valid = Signal(intbv(0)[1:])
 
     baud = Baud(100e6, 1_000_000)
-    uart = rx(clk=clk, reset=rst_n, serial_in=tx, byte_out=data_read, valid=valid, baud=baud)
+    dut = uart.rx(clk=clk, reset=rst_n, serial_in=tx, byte_out=data_read, valid=valid, baud=baud)
 
     start_tx = Signal(0)
     tx_byte = Signal(intbv(0)[8:0])
@@ -111,9 +111,9 @@ def uart_rx_tb():
 
     return instances()
 
-def run(do_dump):
-    tb = uart_rx_tb()
-    tb.config_sim(trace=do_dump)
+def run(trace=False):
+    tb = testbench()
+    tb.config_sim(trace=trace)
     tb.run_sim()
 
 if __name__ == "__main__":
@@ -122,4 +122,4 @@ if __name__ == "__main__":
             do_dump = True
     except IndexError:
         do_dump = False
-    run(do_dump)
+    run(trace=do_dump)
