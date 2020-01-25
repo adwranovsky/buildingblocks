@@ -35,6 +35,9 @@ def testbench():
 
     # Vector of duty cycles to test
     test_vector = [random.randint(0, duty_cycle.max) for x in range(10)]
+    # Make sure the edge cases get tested as well
+    test_vector.append(0)
+    test_vector.append(duty_cycle.max-1)
 
     @always(clk.posedge)
     def flopper():
@@ -52,23 +55,26 @@ def testbench():
             duty_cycle.next = dc
             rst_n.next = 1
 
-            # Wait for two whole periods to complete and count the time it spent high
+            # Wait for ten whole periods to complete while counting the time the signal spent high
+            num_periods = 10
             ones_count = Signal(intbv(0, min=duty_cycle.min, max=duty_cycle.max))
-            yield count_ones_until(clk, pwm_out, ones_count, lambda: flopped_rollover==1)
-            time_high = int(ones_count)
-            yield count_ones_until(clk, pwm_out, ones_count, lambda: flopped_rollover==1)
-            time_high += int(ones_count)
+            time_high = 0
+            for x in range(num_periods):
+                yield count_ones_until(clk, pwm_out, ones_count, lambda: flopped_rollover==1)
+                time_high += int(ones_count)
 
-            if time_high != dc*2:
+            # Validate result
+            expected_time_high = dc * num_periods
+            if time_high != expected_time_high:
                 print(
                     Fore.RED + "FAILED" + Style.RESET_ALL
-                    + f" -- Counted {time_high} cycles high when {dc*2} was expected"
+                    + f" -- Counted {time_high} cycles high when {expected_time_high} was expected"
                 )
                 error_count.next += 1
             else:
                 print(
                     Fore.GREEN + "PASSED" + Style.RESET_ALL
-                    + f" -- Counted {time_high} cycles high when {dc*2} was expected"
+                    + f" -- Counted {time_high} cycles high when {expected_time_high} was expected"
                 )
 
             # Put the dut back in reset for the next test
