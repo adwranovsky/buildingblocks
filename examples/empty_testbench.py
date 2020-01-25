@@ -4,6 +4,7 @@ import random
 from colorama import Fore, Back, Style
 from myhdl import *
 
+from buildingblocks.tb.utilities import make_runnable
 # from buildingblocks.rtl.my_block import my_block <---- Import your module here
 
 @block
