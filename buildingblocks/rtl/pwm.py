@@ -1,7 +1,7 @@
 from myhdl import *
 
 @block
-def pwm(clk, reset, clear, count):
+def pwm(clk, reset, duty_cycle, pwm_out, rollover):
     """A pulse width modulation block.
 
     clk -- The clock input
