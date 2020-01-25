@@ -23,11 +23,11 @@ def pwm(clk, reset, duty_cycle, pwm_out, rollover):
     @always_comb
     def comb_logic():
         pwm_out_glitchy.next = count < duty_cycle
-        rollover = count == count.max-1
+        rollover.next = count == count.max-1
 
     @always_seq(clk.posedge, reset=reset)
     def rollover_counter():
-        count.next = count
+        count.next = count + 1
 
     @always_seq(clk.posedge, reset=reset)
     def flopped_pwm():

@@ -67,7 +67,7 @@ def testbench():
                 error_count.next += 1
             else:
                 print(
-                    Fore.RED + "PASSED" + Style.RESET_ALL
+                    Fore.GREEN + "PASSED" + Style.RESET_ALL
                     + f" -- Counted {time_high} cycles high when {dc*2} was expected"
                 )
 
