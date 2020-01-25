@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import sys
 import random
 
@@ -8,6 +6,7 @@ from myhdl import *
 
 from buildingblocks.model.uart.baud import Baud
 from buildingblocks.rtl import uart
+from ..utilities import make_runnable
 
 def uart_tx_model(tx, data, baud):
     """Models a UART with 1 start bit, 8 data bits, and 1 stop bit.
@@ -111,15 +110,5 @@ def testbench():
 
     return instances()
 
-def run(trace=False):
-    tb = testbench()
-    tb.config_sim(trace=trace)
-    tb.run_sim()
+run = make_runnable(testbench)
 
-if __name__ == "__main__":
-    try:
-        if sys.argv[1] == "-d":
-            do_dump = True
-    except IndexError:
-        do_dump = False
-    run(trace=do_dump)

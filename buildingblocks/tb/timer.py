@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import sys
 import random
 
@@ -7,6 +5,7 @@ from colorama import Fore, Back, Style
 from myhdl import *
 
 from ..rtl.timer import timer
+from .utilities import make_runnable
 
 @block
 def testbench():
@@ -121,15 +120,5 @@ def testbench():
 
     return instances()
 
-def run(trace=False):
-    tb = testbench()
-    tb.config_sim(trace=trace)
-    tb.run_sim()
+run = make_runnable(testbench)
 
-if __name__ == "__main__":
-    try:
-        if sys.argv[1] == "-d":
-            do_dump = True
-    except IndexError:
-        do_dump = False
-    run(trace=do_dump)
