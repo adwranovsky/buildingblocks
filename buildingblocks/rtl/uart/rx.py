@@ -20,6 +20,7 @@ def rx(clk, reset, serial_in, byte_out, valid, baud):
     state = Signal(t_state.IDLE)
 
     shift_reg = Signal(intbv(0)[9:])
+    valid_next_cycle = Signal(intbv(0)[1:])
 
     # half_bit_timer starts at the beginning of the start bit, and the end of
     # it signals the start of full_bit_timer. It ensures that bits are sampled
@@ -34,11 +35,11 @@ def rx(clk, reset, serial_in, byte_out, valid, baud):
     full_bit_timer = timer(clk=clk, reset=reset, start=full_bit_tstart, done=full_bit_done, STOP_COUNT=baud.clocks_per_bit)
 
     bit_count = Signal(intbv(0, min=0, max=9)) # 8 data bits + 1 stop bit = max count of 9
-    bit_counter = incrementer(clk=clk, reset=reset, inc=full_bit_done, clear=valid, count=bit_count)
+    bit_counter = incrementer(clk=clk, reset=reset, inc=full_bit_done, clear=valid_next_cycle, count=bit_count)
 
     @always_comb
     def fsm_comb_logic():
-        valid.next = bit_count == bit_count.max-1 and full_bit_done == 1
+        valid_next_cycle.next = bit_count == bit_count.max-1 and full_bit_done == 1
         byte_out.next = shift_reg[8:0]
         half_bit_tstart.next = state == t_state.IDLE and serial_in == 0
         full_bit_tstart.next = half_bit_done == 1 or (full_bit_done == 1 and not bit_count == bit_count.max-1)
@@ -53,10 +54,14 @@ def rx(clk, reset, serial_in, byte_out, valid, baud):
             if half_bit_done == 1:
                 state.next = t_state.RUNNING
         elif state == t_state.RUNNING:
-            if valid == 1:
+            if valid_next_cycle == 1:
                 state.next = t_state.IDLE
         else:
             raise ValueError("Undefined state")
+
+    @always_seq(clk.posedge, reset=reset)
+    def valid_logic():
+        valid.next = valid_next_cycle
 
     @always_seq(clk.posedge, reset=reset)
     def shift_reg_logic():
