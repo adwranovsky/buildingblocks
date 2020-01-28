@@ -7,7 +7,7 @@ from ..incrementer import incrementer
 
 @block
 def rx(clk, reset, serial_in, byte_out, valid, baud):
-    """A simple UART with a fixed baud rate, one start bit, one stop bit, and no parity bit.
+    """A simple UART rx module with a fixed baud rate, one start bit, one stop bit, and no parity bit.
     clk -- The input clock
     reset -- The reset signal
     serial_in -- The serial data signal, it is high when inactive
