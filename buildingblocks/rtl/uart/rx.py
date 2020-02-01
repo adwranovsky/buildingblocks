@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from myhdl import *
 
 from ..timer import timer
