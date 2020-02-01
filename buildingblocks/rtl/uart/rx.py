@@ -69,4 +69,3 @@ def rx(clk, reset, serial_in, byte_out, valid, baud):
             shift_reg.next = shift_reg
 
     return instances()
-

@@ -2,6 +2,7 @@ from myhdl import *
 
 from ..timer import timer
 from ..incrementer import incrementer
+from buildingblocks.model.uart.baud import Baud
 
 @block
 def tx(clk, reset, serial_out, byte_in, start, done, baud):
@@ -32,11 +33,11 @@ def tx(clk, reset, serial_out, byte_in, start, done, baud):
 
     @always_comb
     def done_logic():
-        done.next = state==t_state.BUSY and bit_count == bit_count.max-1 and full_bit_done
+        done.next = state==t_state.BUSY and bit_count==bit_count.max-1 and full_bit_done==1
 
     @always_comb
     def fsm_comb_logic():
-        full_bit_tstart.next = (state==t_state.IDLE and start) or (state==t_state.BUSY and (full_bit_done and not done or start and done))
+        full_bit_tstart.next = (state==t_state.IDLE and start) or (state==t_state.BUSY and (full_bit_done==1 and not done==1 or start==1 and done==1))
         serial_out.next = shift_reg[0]
 
     @always_seq(clk.posedge, reset=reset)
