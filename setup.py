@@ -16,7 +16,7 @@ setup(
     #url='https://github.com/pypa/sampleproject',  # Optional
     author="Alexander Wranovsky",
     author_email="alex@wranovsky.org",
-    packages=['buildingblocks'],
+    packages=find_packages(),
     python_requires=">=3.5",
     install_requires=["myhdl", "colorama"]
 )
